@@ -8,28 +8,33 @@ import (
 	"github.com/hashicorp/hc-install/releases"
 	"github.com/hashicorp/terraform-exec/tfexec"
 	log "github.com/sirupsen/logrus"
+	"github.com/unravellingtechnologies/unravelling-cloud/cli/lib/server"
+
 	// TODO: How to get rid of this import? https://github.com/unravellingtechnologies/unravelling-cloud/issues/1
 	_ "github.com/unravellingtechnologies/unravelling-cloud/cli/lib/logging"
 	"net/http"
 )
 
+const tfVersion = "1.3.7"
+
 var tf *tfexec.Terraform
 
-var Router *mux.Router
+var tfRouter *mux.Router
 
-func initRouter() {
-	Router = mux.NewRouter()
-	Router.HandleFunc("/plan", PlanHandler)
+// initSubRouter Initializes the sub-router for the Terraform endpoint.
+func initSubRouter(r *mux.Router) {
+	tfRouter = mux.NewRouter()
+	tfRouter.HandleFunc("/plan", PlanHandler)
+	server.Mount(r, "/api/terraform", tfRouter)
 }
 
-func init() {
-	initRouter()
-
-	log.Infof("Initializing Terraform...")
+// installTerraform Installs Terraform if it is not already installed.
+func installTerraform() {
+	log.Infof("Initializing Terraform endpoint...")
 
 	installer := &releases.ExactVersion{
 		Product: product.Terraform,
-		Version: version.Must(version.NewVersion("1.3.7")),
+		Version: version.Must(version.NewVersion(tfVersion)),
 	}
 
 	execPath, err := installer.Install(context.Background())
@@ -46,6 +51,15 @@ func init() {
 	} else {
 		log.Infof("Terraform initialized at working directory%s", workingDir)
 	}
+}
+
+func Prepare(r *mux.Router) {
+	initSubRouter(r)
+	installTerraform()
+}
+
+func openWorkDir() {
+
 }
 
 func Init() {

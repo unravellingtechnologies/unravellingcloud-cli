@@ -1,2 +1,6 @@
 # IDE
 .idea
+
+# Logs and output files
+*.log
+*.out

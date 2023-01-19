@@ -4,7 +4,6 @@ Copyright © 2022 Unravelling Technologies GmbH <unravelling@unravelling.io>
 package agent
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 )
 
@@ -19,9 +18,6 @@ var AgentCmd = &cobra.Command{
 	Use:   "agent",
 	Short: "Use the CLI to start an agent",
 	Long:  `The agent command allows to start an agent locally. This agent can then be accessed via GraphQL.`,
-	Run: func(agentCmd *cobra.Command, args []string) {
-		fmt.Println("agent called")
-	},
 }
 
 func init() {

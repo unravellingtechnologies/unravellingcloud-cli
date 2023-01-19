@@ -5,8 +5,7 @@ package agent
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/unravellingtechnologies/unravelling-cloud/cli/lib/server"
-	"github.com/unravellingtechnologies/unravelling-cloud/cli/lib/terraform"
+	"github.com/unravellingtechnologies/unravelling-cloud/cli/lib/agent"
 )
 
 // StartCmd represents the start command
@@ -20,10 +19,6 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(startCmd *cobra.Command, args []string) {
-		server.StartServer(&server.ServerOpts{Port: port, Host: host})
+		agent.Start(host, port, terraformEnabled, workingDir)
 	},
-}
-
-func init() {
-	server.Mount(server.Router, "/api/terraform", terraform.Router)
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,24 +12,27 @@ import (
 	"time"
 )
 
-type ServerOpts struct {
+// Opts are the options for the server
+type Opts struct {
 	Port int
 	Host string
 }
 
-func StartServer(s *ServerOpts) {
+// StartServer starts the HTTP server.
+func StartServer(s *Opts) {
 	srv := &http.Server{Addr: fmt.Sprintf("%s:%d", s.Host, s.Port), Handler: Router}
 
 	go func() {
-		logrus.Infof("Unravelling Cloud Agent started listening on %s:%d", s.Host, s.Port)
+		log.Infof("Unravelling Cloud Agent started listening on %s:%d", s.Host, s.Port)
 		err := srv.ListenAndServe()
 		if err != nil {
 			if err == http.ErrServerClosed {
-				logrus.Infof("Server shutting down...")
+				log.Infof("Server shutting down...")
 			} else {
-				logrus.Fatalf("Could not listen on %s:%d. %v\n", s.Host, s.Port, err)
+				log.Fatalf("Could not listen on %s:%d. %v\n", s.Host, s.Port, err)
+				os.Exit(1)
 			}
-			logrus.Error(err)
+			log.Error(err)
 			return
 		}
 	}()
@@ -44,7 +47,7 @@ func StartServer(s *ServerOpts) {
 
 	// Use the Shutdown method to gracefully shut down the server.
 	if err := srv.Shutdown(ctx); err != nil {
-		logrus.Fatal("Error:", err)
+		log.Fatal("Error:", err)
 	}
 }
 
